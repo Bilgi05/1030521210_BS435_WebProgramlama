@@ -3,11 +3,23 @@ import StartScreen from "./components/StartScreen";
 
 function App() {
   const [started, setStarted] = useState(false);
+  const [images, setImages] = useState([]); // yeni state
+
+  // oyun başlangıcında fake 3 img ID üret
+  function initializeGameImages() {
+    const tempImages = ["img1", "img2", "img3"]; // şimdilik placeholder
+    setImages(tempImages);
+  }
 
   return (
     <>
       {!started ? (
-        <StartScreen onStart={() => setStarted(true)} />
+        <StartScreen
+          onStart={() => {
+            initializeGameImages(); // <- işlev ekleme
+            setStarted(true);
+          }}
+        />
       ) : (
         <div
           style={{
