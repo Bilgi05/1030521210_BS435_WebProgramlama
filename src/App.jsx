@@ -3,12 +3,15 @@ import StartScreen from "./components/StartScreen";
 
 function App() {
   const [started, setStarted] = useState(false);
-  const [images, setImages] = useState([]); // yeni state
+  const [images, setImages] = useState([]);
 
-  // oyun başlangıcında fake 3 img ID üret
   function initializeGameImages() {
-    const tempImages = ["img1", "img2", "img3"]; // şimdilik placeholder
-    setImages(tempImages);
+    setImages(["img1", "img2", "img3"]);
+  }
+
+  function restartGame() {
+    setStarted(false);
+    setImages([]);
   }
 
   return (
@@ -16,7 +19,7 @@ function App() {
       {!started ? (
         <StartScreen
           onStart={() => {
-            initializeGameImages(); // <- işlev ekleme
+            initializeGameImages();
             setStarted(true);
           }}
         />
@@ -26,6 +29,7 @@ function App() {
             height: "100vh",
             width: "100vw",
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "#f5f5f5",
@@ -33,6 +37,21 @@ function App() {
           }}
         >
           <h2>Oyun ekranı yakında eklenecek...</h2>
+          <button
+            onClick={restartGame}
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              fontSize: "16px",
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Yeni Tur Başlat
+          </button>
         </div>
       )}
     </>
