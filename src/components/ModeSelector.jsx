@@ -1,39 +1,55 @@
-const ModeSelector = ({ selectedMode, setSelectedMode }) => {
+function ModeSelector({ onSelect }) {
   return (
-    <div style={{ display: "inline-block", textAlign: "center" }}>
-      <div style={{ marginBottom: 8, fontWeight: 600 }}>Oyun Modu:</div>
-      <button
-        onClick={() => setSelectedMode("easy")}
-        style={{
-          marginRight: 8,
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: selectedMode === "easy" ? "2px solid #007bff" : "1px solid #ccc",
-          background: selectedMode === "easy" ? "#e6f0ff" : "#fff",
-          cursor: "pointer",
-        }}
-      >
-        Kolay
-      </button>
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "sans-serif",
+        backgroundColor: "#f5f5f5",
+        textAlign: "center",
+      }}
+    >
+      <h2>Oyun Modunu Seç</h2>
 
-      <button
-        onClick={() => setSelectedMode("hard")}
-        style={{
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: selectedMode === "hard" ? "2px solid #007bff" : "1px solid #ccc",
-          background: selectedMode === "hard" ? "#e6f0ff" : "#fff",
-          cursor: "pointer",
-        }}
-      >
-        Zor
-      </button>
+      <div style={{ marginTop: 30, display: "flex", gap: 20 }}>
+        <button
+          onClick={() => onSelect("easy")}
+          style={buttonStyle}
+        >
+          Easy Mode
+          <p style={descStyle}>İpucu verilir</p>
+        </button>
 
-      <div style={{ marginTop: 8, fontSize: 13, opacity: 0.8 }}>
-        Seçili mod: {selectedMode === "easy" ? "Kolay" : "Zor"}
+        <button
+          onClick={() => onSelect("hard")}
+          style={buttonStyle}
+        >
+          Hard Mode
+          <p style={descStyle}>İpucu yok</p>
+        </button>
       </div>
     </div>
   );
+}
+
+const buttonStyle = {
+  padding: "20px",
+  width: "160px",
+  borderRadius: "12px",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "16px",
+  backgroundColor: "#007bff",
+  color: "#fff",
+};
+
+const descStyle = {
+  fontSize: "12px",
+  marginTop: 8,
+  opacity: 0.9,
 };
 
 export default ModeSelector;
