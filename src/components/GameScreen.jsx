@@ -1,139 +1,76 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-// Statik örnek veri (Gerçek projede bir API'den veya ayrı bir JSON dosyasından gelmeli)
-const GAME_LEVELS = [
-  {
-    id: 1,
+const CATEGORY_DATA = {
+  nature: {
     images: [
-      { id: "img1", url: "https://picsum.photos/id/11/300/300", isAI: false },
-      { id: "img2", url: "https://picsum.photos/id/10/300/300", isAI: true }, // Bu AI olsun
-      { id: "img3", url: "https://picsum.photos/id/12/300/300", isAI: false },
+      { id: "n1", url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=400&h=400&fit=crop", isAI: false },
+      { id: "n2", url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=400&h=400&fit=crop", isAI: true },
+      { id: "n3", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=400&h=400&fit=crop", isAI: false },
     ],
-    hint: "Yapay zeka görsellerinde genellikle arka plan detayları ve insan figürlerindeki küçük kusurlar dikkat çeker. Özellikle eller ve gözlere odaklanın!"
+    hint: "Doğa fotoğraflarında suyun akışındaki pürüzsüzlüğe ve ışık kırılmalarına bak!"
   },
-  // İkinci bir seviye eklenebilir
-  {
-    id: 2,
+  portrait: {
     images: [
-      { id: "img4", url: "https://picsum.photos/id/13/300/300", isAI: false },
-      { id: "img5", url: "https://picsum.photos/id/14/300/300", isAI: false },
-      { id: "img6", url: "https://picsum.photos/id/15/300/300", isAI: true }, // Bu AI olsun
+      { id: "p1", url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&h=400&fit=crop", isAI: false },
+      { id: "p2", url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&h=400&fit=crop", isAI: true },
+      { id: "p3", url: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=400&h=400&fit=crop", isAI: false },
     ],
-    hint: "Simetri ve doğal olmayan desenler yapay zeka ipucu olabilir. Özellikle doğa ve hayvan fotoğraflarında beklenmedik kusurlar arayın."
+    hint: "Yüz hatlarındaki aşırı simetriye ve saç tellerinin arka planla birleştiği noktalara odaklan!"
+  },
+  art: {
+    images: [
+      { id: "a1", url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=400&h=400&fit=crop", isAI: false },
+      { id: "a2", url: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?q=80&w=400&h=400&fit=crop", isAI: false },
+      { id: "a3", url: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=400&h=400&fit=crop", isAI: true },
+    ],
+    hint: "Fırça darbelerinin dokusuna ve boya katmanlarının derinliğine dikkat et!"
   }
-];
+};
 
 function GameScreen({ mode, onFinish }) {
-  const [currentLevelIndex, setCurrentLevelIndex] = useState(0); // Çoklu seviye için
-  const currentLevel = GAME_LEVELS[currentLevelIndex];
-
-  const [attempts, setAttempts] = useState(0); // 0: hiç tahmin yok, 1: bir yanlış yapıldı (ipucu verildi)
+  const [disabledImages, setDisabledImages] = useState([]);
+  const [attempts, setAttempts] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(20); // Zamana Karşı Modu için süre
 
-  // Zamanlayıcı efekti (Zamana Karşı Modu için)
-  useEffect(() => {
-    if (mode === "Zamana Karşı" && timeLeft > 0) {
-      const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-      return () => clearInterval(timer);
-    } else if (mode === "Zamana Karşı" && timeLeft === 0) {
-      onFinish({ success: false, message: "Süre doldu! Daha hızlı olmalısın." });
-    }
-  }, [timeLeft, mode, onFinish]);
+  const level = CATEGORY_DATA[mode.id];
 
   const handleImageClick = (image) => {
+    if (disabledImages.includes(image.id)) return;
     if (image.isAI) {
-      // Doğru Tahmin
-      onFinish({ 
-        success: true, 
-        message: "Tebrikler! Yapay zeka tarafından üretilen görseli doğru tahmin ettin." 
-      });
+      onFinish({ success: true, message: `Harika! ${mode.badge} olmayı hak ettin.` });
     } else {
-      // Yanlış Tahmin
       if (attempts === 0) {
         setAttempts(1);
-        setShowHint(true); // İlk yanlışta ipucu göster (Ödev kuralı)
+        setShowHint(true);
+        setDisabledImages([...disabledImages, image.id]);
       } else {
-        // İkinci yanlışta oyun biter
-        onFinish({ 
-          success: false, 
-          message: "Yanlış tahmin! İkinci şansını da kaybettin. AI seni kandırdı." 
-        });
+        onFinish({ success: false, message: "İkinci şansını da kaybettin. AI kazandı!" });
       }
     }
   };
 
   return (
     <div>
-      <h2 style={gameScreenStyles.title}>{mode}</h2>
-      {mode === "Zamana Karşı" && (
-        <p style={gameScreenStyles.timer}>Kalan Süre: <span style={{ color: timeLeft <= 5 ? '#e74c3c' : '#2c3e50', fontWeight: 'bold' }}>{timeLeft}s</span></p>
-      )}
-      
-      <p style={gameScreenStyles.instruction}>Hangi görsel **yapay zeka (AI)** tarafından üretilmiştir?</p>
-
-      <div style={gameScreenStyles.imageGrid}>
-        {currentLevel.images.map((img) => (
-          <div 
-            key={img.id} 
-            onClick={() => handleImageClick(img)}
-            style={gameScreenStyles.imageWrapper}
-          >
-            <img src={img.url} alt="Görsel Seçeneği" style={gameScreenStyles.image} />
+      <h2 style={{ color: mode.color }}>{mode.title}</h2>
+      <div style={{ display: "flex", gap: "15px", justifyContent: "center", marginTop: "20px" }}>
+        {level.images.map((img) => (
+          <div key={img.id} onClick={() => handleImageClick(img)} style={{
+            opacity: disabledImages.includes(img.id) ? 0.4 : 1,
+            filter: disabledImages.includes(img.id) ? "grayscale(100%)" : "none",
+            cursor: disabledImages.includes(img.id) ? "not-allowed" : "pointer",
+            transition: "0.3s", borderRadius: "15px", overflow: "hidden", border: "4px solid #fff"
+          }}>
+            <img src={img.url} alt="Seçenek" style={{ width: "180px", height: "180px", objectFit: "cover" }} />
           </div>
         ))}
       </div>
-
       {showHint && (
-        <div style={gameScreenStyles.hintBox}>
-          <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>💡 İpucu!</p>
-          <p>{currentLevel.hint}</p>
-          <small style={{ marginTop: '10px', display: 'block', color: '#555' }}>Bir hakkın daha var, dikkatli ol!</small>
+        <div style={{ backgroundColor: "#fff3cd", padding: "15px", marginTop: "20px", borderRadius: "10px", color: "#856404" }}>
+          💡 <b>İkinci Şans!</b> {level.hint}
         </div>
       )}
     </div>
   );
 }
-
-const gameScreenStyles = {
-  title: { fontSize: '2rem', marginBottom: '10px', fontWeight: '700', color: '#2c3e50' },
-  timer: { fontSize: '1.2rem', marginBottom: '20px', color: '#34495e' },
-  instruction: { fontSize: '1.1rem', color: '#7f8c8d', marginBottom: '30px' },
-  imageGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', // Duyarlı ızgara
-    gap: '20px',
-    marginBottom: '30px',
-  },
-  imageWrapper: {
-    cursor: 'pointer',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    border: '3px solid transparent',
-    '&:hover': {
-      transform: 'scale(1.03)',
-      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
-      borderColor: '#3498db',
-    },
-  },
-  image: {
-    width: '100%',
-    height: '180px', // Yüksekliği sabit tutalım
-    objectFit: 'cover',
-    display: 'block',
-  },
-  hintBox: {
-    backgroundColor: '#fff3cd',
-    border: '1px solid #ffeeba',
-    borderRadius: '8px',
-    padding: '20px',
-    marginTop: '20px',
-    color: '#856404',
-    textAlign: 'left',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-  },
-};
 
 export default GameScreen;

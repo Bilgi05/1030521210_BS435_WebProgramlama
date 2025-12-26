@@ -6,62 +6,44 @@ import ResultScreen from "./components/ResultScreen";
 
 function App() {
   const [step, setStep] = useState("START");
-  const [mode, setMode] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [result, setResult] = useState(null);
 
-  // Sayfayı tam ortalayan ana stil
   const mainLayout = {
-    minHeight: "100vh",
-    width: "100vw",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", // Estetik mor-mavi gradyan
-    margin: 0,
-    padding: "20px",
-    boxSizing: "border-box",
-    overflowX: "hidden"
+    minHeight: "100vh", width: "100vw", display: "flex",
+    justifyContent: "center", alignItems: "center",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    margin: 0, padding: "20px", boxSizing: "border-box"
   };
 
-  // İçerik kartı
   const glassCard = {
-    background: "rgba(255, 255, 255, 0.95)",
-    borderRadius: "24px",
-    padding: "40px",
-    boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
-    width: "100%",
-    maxWidth: "600px", // Kartın çok yayılmasını önler
-    textAlign: "center"
+    background: "rgba(255, 255, 255, 0.95)", borderRadius: "24px",
+    padding: "40px", boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
+    width: "100%", maxWidth: "800px", textAlign: "center"
   };
 
   return (
     <div style={mainLayout}>
       <div style={glassCard}>
-        {step === "START" && (
-          <StartScreen onStart={() => setStep("MODE")} />
-        )}
-        
-        {step === "MODE" && (
-          <ModeSelector onSelect={(selectedMode) => {
-            setMode(selectedMode);
-            setStep("GAME");
-          }} />
-        )}
-        
+        {step === "START" && <StartScreen onStart={() => setStep("MODE")} />}
+        {step === "MODE" && <ModeSelector onSelect={(cat) => { setSelectedCategory(cat); setStep("GAME"); }} />}
         {step === "GAME" && (
-          <GameScreen mode={mode} onFinish={(res) => {
-            setResult(res);
-            setStep("RESULT");
-          }} />
+          <GameScreen 
+            mode={selectedCategory} 
+            onFinish={(res) => {
+              setResult({ ...res, modeInfo: selectedCategory });
+              if (res.success) {
+                const badges = JSON.parse(localStorage.getItem("user_badges") || "[]");
+                if (!badges.includes(selectedCategory.badge)) {
+                  badges.push(selectedCategory.badge);
+                  localStorage.setItem("user_badges", JSON.stringify(badges));
+                }
+              }
+              setStep("RESULT");
+            }} 
+          />
         )}
-        
-        {step === "RESULT" && (
-          <ResultScreen result={result} onRestart={() => {
-            setStep("START");
-            setMode(null);
-            setResult(null);
-          }} />
-        )}
+        {step === "RESULT" && <ResultScreen result={result} onRestart={() => { setStep("START"); setSelectedCategory(null); setResult(null); }} />}
       </div>
     </div>
   );

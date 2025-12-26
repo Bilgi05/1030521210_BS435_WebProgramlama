@@ -18,7 +18,7 @@ function StartScreen({ onStart }) {
       {showRules && (
         <div style={modalOverlay}>
           <div style={modalContent}>
-            <h3>🎯 Oyun Kuralları</h3>
+            <h3>Oyun Kuralları</h3>
             <ul style={{ textAlign: "left", fontSize: "14px", lineHeight: "1.8" }}>
               <li>Sana aynı anda 3 farklı görsel sunulacak.</li>
               <li>2'si gerçek, 1'i yapay zeka ürünüdür.</li>
