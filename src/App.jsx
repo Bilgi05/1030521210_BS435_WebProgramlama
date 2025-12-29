@@ -28,19 +28,20 @@ function App() {
         {step === "START" && <StartScreen onStart={() => setStep("MODE")} />}
         {step === "MODE" && <ModeSelector onSelect={(cat) => { setSelectedCategory(cat); setStep("GAME"); }} />}
         {step === "GAME" && (
-          <GameScreen 
-            mode={selectedCategory} 
+          <GameScreen
+            mode={selectedCategory}
             onFinish={(res) => {
               setResult({ ...res, modeInfo: selectedCategory });
+
               if (res.success) {
-                const badges = JSON.parse(localStorage.getItem("user_badges") || "[]");
-                if (!badges.includes(selectedCategory.badge)) {
-                  badges.push(selectedCategory.badge);
-                  localStorage.setItem("user_badges", JSON.stringify(badges));
+                const currentBadges = JSON.parse(localStorage.getItem("user_badges") || "[]");
+                if (!currentBadges.includes(selectedCategory.badge)) {
+                  currentBadges.push(selectedCategory.badge);
+                  localStorage.setItem("user_badges", JSON.stringify(currentBadges));
                 }
               }
               setStep("RESULT");
-            }} 
+            }}
           />
         )}
         {step === "RESULT" && <ResultScreen result={result} onRestart={() => { setStep("START"); setSelectedCategory(null); setResult(null); }} />}
